@@ -114,6 +114,29 @@
             <param name="b0A"></param>
             <returns></returns>
         </member>
+        <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.String,System.Int32,System.String,System.Int32,System.Int32)">
+            <summary>
+            适用于需要判断接收数据超时提醒的情况
+            适用于需要加CHKSUM情况
+            </summary>
+            <param name="Msg"></param>
+            <param name="RTimeOut"></param>
+            <param name="CKSType"></param>
+            <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
+            <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
+            <returns></returns>
+        </member>
+        <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            适用于不需要判断接收数据超时提醒的情况
+            适用于需要加CHKSUM情况
+            </summary>
+            <param name="Msg"></param>
+            <param name="CKSType"></param>
+            <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
+            <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
+            <returns></returns>
+        </member>
         <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean,System.Int32)">
             <summary>
             Recieve Message via COM，超时无数据返回报错提醒

@@ -25,6 +25,7 @@ namespace CMNCOM
             DeviceUI = new UserControl_UI(devName);
             DeviceUI.User_Load(true);
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -32,6 +33,7 @@ namespace CMNCOM
         {
             DeviceUI.ComDevice.Close();
         }
+
         /// <summary>
         /// 适用于默认发送不带回车和换行
         /// </summary>
@@ -152,6 +154,66 @@ namespace CMNCOM
             string str = RecieveMsg(Recive_hexBool,RTimeOut);
             DeviceClose();
             return str;
+        }
+       
+        /// <summary>
+        /// 适用于需要判断接收数据超时提醒的情况
+        /// 适用于需要加CHKSUM情况
+        /// </summary>
+        /// <param name="Msg"></param>
+        /// <param name="RTimeOut"></param>
+        /// <param name="CKSType"></param>
+        /// <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
+        /// <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
+        /// <returns></returns>
+        public string SendReciveMsg(string Msg, int RTimeOut, string CKSType, int StartFromIndex, int EndToIndex)
+        {
+            string StrCKS = GetCKSByType(Msg, CKSType, StartFromIndex, EndToIndex);
+            DeviceClose();
+            Thread.Sleep(10);
+            DeviceOpen();          
+            if (!SendMsg(true, Msg + StrCKS, false, false)) return null;
+            string str = RecieveMsg(true, RTimeOut);
+            DeviceClose();
+            return str;
+        }
+
+        /// <summary>
+        /// 适用于不需要判断接收数据超时提醒的情况
+        /// 适用于需要加CHKSUM情况
+        /// </summary>
+        /// <param name="Msg"></param>
+        /// <param name="CKSType"></param>
+        /// <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
+        /// <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
+        /// <returns></returns>
+        public string SendReciveMsg(string Msg, string CKSType, int StartFromIndex, int EndToIndex)
+        {
+            return SendReciveMsg(Msg, 1, CKSType, StartFromIndex, EndToIndex);
+        }
+
+        internal string GetCKSByType(String Msg,string CKSType, int StartFromIndex, int EndToIndex)
+        {
+            string data = Msg.Replace(" ", "");
+            StartFromIndex = 2 * StartFromIndex - 2;
+            EndToIndex = 2 * EndToIndex - 2;
+            if (StartFromIndex < 0) StartFromIndex = 0;
+            if (EndToIndex < 0) EndToIndex = 0;
+            data = data.Substring(StartFromIndex, data.Length - EndToIndex - StartFromIndex);
+            string StrCKS = "";
+            switch (CKSType.ToUpper())
+            {
+                case "BCC":
+                    StrCKS = getChkSum.EModule.BCC(data);
+                    break;
+                case "LRC":
+                    StrCKS = getChkSum.EModule.LRC(data);
+                    break;
+                default:
+                    StrCKS = "";
+                    break;
+            }
+            return StrCKS;
         }
 
         /// <summary>

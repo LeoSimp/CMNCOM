@@ -29,7 +29,9 @@ namespace CMNCOM
         {
             EMoudleInstance = new EMoudle(devName);
             InitializeComponent();
+            cbCKS.SelectedIndex = 0;
             Conf_Load();
+            EMoudleInstance.EmoudleDispose(); //释放占用的COM口
         }
 
         internal void Conf_Load()
@@ -92,6 +94,7 @@ namespace CMNCOM
         {
             Conf_Save();
         }
+
         private void Conf_Save()
         {
             try
@@ -118,27 +121,56 @@ namespace CMNCOM
             }
         }
 
-
         private void SendMsg_Click1(object sender, EventArgs e)
         {
             ButtonSend(cb_T_HEX, tb_SendMsg,5);
         }      
 
         private void ButtonSend(CheckBox cb,TextBox tb)
-        {           
-            WriteLog(rtb_ReciveMsg, "Send: " + tb.Text );
+        {
+            ButtonSend(cb, tb, 1);
+        }
+        private void ButtonSend1(CheckBox cb, TextBox tb,int TimeOut)
+        {
+            if (cbCKS.SelectedItem.ToString() == "None")
+            {
+                tbCKS_Value.Text = "";               
+            } else
+            {
+                int StartFromIndex = 2*Convert.ToInt32(tbStartFromIndex.Text)-2;
+                int EndToIndex = 2*Convert.ToInt32(tbEndToIndex.Text)-2;
+                if (StartFromIndex < 0) StartFromIndex = 0;
+                if (EndToIndex < 0) EndToIndex = 0;
+                string data = tb.Text.Replace(" ", "");
+                data = data.Substring(StartFromIndex, data.Length - EndToIndex - StartFromIndex);
+
+                switch (cbCKS.SelectedItem.ToString())
+                {
+                    case "BCC":
+                        tbCKS_Value.Text = getChkSum.EModule.BCC(data);
+                        break;
+                    case "LRC":
+                        tbCKS_Value.Text = getChkSum.EModule.LRC(data);
+                        break;
+                    default:
+                        tbCKS_Value.Text = "";
+                        break;
+                }              
+            }
+            WriteLog(rtb_ReciveMsg, "Send: " + tb.Text + " " + tbCKS_Value.Text);
             rtb_ReciveMsg.Update();
-            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text, cb_R_HEX.Checked,cb0D.Checked,cb0A.Checked);
+            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut, cb0D.Checked, cb0A.Checked);
             WriteLog(rtb_ReciveMsg, "Recieve: " + rst + "\r\n");
         }
-        private void ButtonSend(CheckBox cb, TextBox tb,int TimeOut)
-        {
-            WriteLog(rtb_ReciveMsg, "Send: "+tb.Text);
-            rtb_ReciveMsg.Update();
-            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text, cb_R_HEX.Checked,TimeOut, cb0D.Checked, cb0A.Checked);
-            WriteLog(rtb_ReciveMsg, "Recieve: "+rst+"\r\n");
-        }
 
+        private void ButtonSend(CheckBox cb, TextBox tb, int TimeOut)
+        {
+            tbCKS_Value.Text = EMoudleInstance.GetCKSByType(tb.Text, cbCKS.SelectedItem.ToString(), Convert.ToInt32(tbStartFromIndex.Text), Convert.ToInt32(tbEndToIndex.Text));
+            WriteLog(rtb_ReciveMsg, "Send: " + tb.Text + " " + tbCKS_Value.Text);
+            rtb_ReciveMsg.Update();
+            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut, cb0D.Checked, cb0A.Checked);
+            WriteLog(rtb_ReciveMsg, "Recieve: " + rst + "\r\n");
+        }
 
         #region 利用委托解决跨线程调用问题方法(WriteLog)
         private delegate void WriteLogUnSafe(RichTextBox logRichTxt, string strLog);
@@ -239,5 +271,19 @@ namespace CMNCOM
             ModifyBtnText(button7);
         }
         #endregion
+
+        private void cbCKS_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbCKS.SelectedItem.ToString() != "None") {
+                cb_R_HEX.Checked = true;
+                cb_R_HEX.Enabled = false;
+                cb_T_HEX.Checked = true;
+                cb_T_HEX.Enabled = false;
+            } else
+            {
+                cb_R_HEX.Enabled = true;
+                cb_T_HEX.Enabled = true;
+            }
+        }
     }
 }
