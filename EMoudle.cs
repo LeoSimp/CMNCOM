@@ -24,6 +24,7 @@ namespace CMNCOM
         {
             DeviceUI = new UserControl_UI(devName);
             DeviceUI.User_Load(true);
+            EmoudleDispose();//这里最好也释放掉COM口
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace CMNCOM
                     if (b0D) Msg += "0D";
                     if (b0A) Msg += "0A";
                     byte[] buf = HexStringToByteArray(Msg);
-                    Console.WriteLine(BitConverter.ToString(buf));                   
+                    //Console.WriteLine(BitConverter.ToString(buf));                   
                     DeviceUI.ComDevice.Write(buf, 0, buf.Length);
                     return true;
                 }
@@ -302,7 +303,7 @@ namespace CMNCOM
         {
             s = s.Replace(" ", "");
             byte[] buffer = new byte[s.Length / 2];
-            Console.WriteLine(s.Length / 2);
+            //Console.WriteLine(s.Length / 2);
             for (int i = 0; i < s.Length; i += 2)
             {
                 buffer[i / 2] = (byte)Convert.ToByte(s.Substring(i, 2), 16);
