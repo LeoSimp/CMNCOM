@@ -231,12 +231,12 @@ namespace CMNCOM
             do
             {
                 ByteNum = DeviceUI.ComDevice.BytesToRead;
-                Thread.Sleep(1);
+                Thread.Sleep(10);
                 inti += 1;
                 //Console.WriteLine("inti："+inti);
                 //15S
             }
-            while ((ByteNum == 0) && (inti < timeout*1000));
+            while ((ByteNum == 0) && (inti < timeout*40));
             if (ByteNum == 0)
             {
                 if (timeout!=1) MessageBox.Show("读取数据包个数为0，等待超时！("+ timeout + "S)", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
