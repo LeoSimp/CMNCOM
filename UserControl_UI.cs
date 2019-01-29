@@ -75,39 +75,7 @@ namespace CMNCOM
             "2"});
         }
 
-        private void CheckDeviceLoop()
-        {
-            while (true)
-            {
-                Thread.Sleep(2000);
-                try
-                {
-                    string[] range = SerialPort.GetPortNames();
-                    List<string> tempList = new List<string>(range);
-                    for (int j = 0; j < range.Length; j++)
-                    {
-                        if (!this.drpComList.Items.Contains(range[j]))
-                        {
-                            this.Invoke(new MethodInvoker(delegate
-                            {
-                                this.drpComList.Items.Add(range[j]);
-                            }));
-                        }
-                    }
-                    for (int j = this.drpComList.Items.Count - 1; j >= 0; j--)
-                    {
-                        if (!tempList.Contains(drpComList.Items[j].ToString()))
-                        {
-                            this.Invoke(new MethodInvoker(delegate
-                            {
-                                drpComList.Items.RemoveAt(j);
-                            }));
-                        }
-                    }
-                }
-                catch { }
-            }
-        }
+      
 
         /// <summary>
         /// 加载配置文件并初始化及打开COM,只在EMoudle中被调用打开COM
@@ -134,7 +102,8 @@ namespace CMNCOM
                 }
                 //~~~~~~~~~~
                 if (!string.IsNullOrEmpty(ComDevice.DeviceDiscription)) this.DeviceName.Text = ComDevice.DeviceDiscription;
-                UpdateComList(drpComList, ComDevice.UserPortName);
+                UpdateComList(drpComList);
+                SelectOne(drpComList, ComDevice.UserPortName);
                 //MessageBox.Show("Pause");
                 SelectOne(drpBaudRate, ComDevice.userBaudRate);
                 SelectOne(drpParity, ComDevice.userParity);
@@ -164,13 +133,25 @@ namespace CMNCOM
             }
         }
 
-        private void UpdateComList(ComboBox cmb, string str)
+        private void UpdateComList(ComboBox cmb)
         {
-            foreach (string s in SerialPort.GetPortNames())
+            string[] range = SerialPort.GetPortNames();
+            foreach (string s in range)
             {
-                cmb.Items.Add(s);               
+               if(!cmb.Items.Contains(s)) cmb.Items.Add(s);               
             }
-            SelectOne(cmb, str);
+            List<string> tempList = new List<string>(range);
+            for (int j=cmb.Items.Count-1;j>=0 ;j--) //从大往小减去，因为Index是动态的
+            {
+                if (!tempList.Contains(cmb.Items[j].ToString()))
+                {
+                    this.Invoke(new MethodInvoker(delegate
+                    {
+                        cmb.Items.RemoveAt(j);
+                    }));
+                } 
+            }
+
         }
 
         /// <summary>
@@ -235,6 +216,13 @@ namespace CMNCOM
             }
         }
 
+
+
+        private void drpComList_Click(object sender, EventArgs e)
+        {
+            UpdateComList(drpComList);
+            //CheckDeviceLoop();
+        }
     }
 
     /// <summary>
@@ -269,6 +257,7 @@ namespace CMNCOM
                 { this.PortName = value; }
                 else
                 {
+                    this.PortName = value;
                     //MessageBox.Show("本地计算机不存在端口:" + value);
                 }
             }

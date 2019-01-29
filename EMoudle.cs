@@ -83,7 +83,7 @@ namespace CMNCOM
             }
             else
             {
-                MessageBox.Show("COM处于断开状态，请检查！", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                //MessageBox.Show("COM处于断开状态，请检查！", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
                 return false ;
             }
         }

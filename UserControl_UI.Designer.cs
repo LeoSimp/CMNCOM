@@ -87,7 +87,9 @@
             this.drpComList.Margin = new System.Windows.Forms.Padding(4);
             this.drpComList.Name = "drpComList";
             this.drpComList.Size = new System.Drawing.Size(132, 23);
+            this.drpComList.Sorted = true;
             this.drpComList.TabIndex = 61;
+            this.drpComList.Click += new System.EventHandler(this.drpComList_Click);
             // 
             // UC_Tittle
             // 
