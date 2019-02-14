@@ -84,6 +84,7 @@ namespace CMNCOM
             else
             {
                 //MessageBox.Show("COM处于断开状态，请检查！", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                Console.WriteLine(DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription+":\rCOM处于断开状态，请检查！\r");
                 return false ;
             }
         }
@@ -114,7 +115,7 @@ namespace CMNCOM
         {
             DeviceClose();
             Thread.Sleep(10);
-            DeviceOpen();
+            if (!DeviceOpen()) return "error";
             if (!SendMsg(Send_hexBool, Msg, b0D, b0A)) return null;
             string str = RecieveMsg(Recive_hexBool);
             DeviceClose();
@@ -150,8 +151,8 @@ namespace CMNCOM
         {
             DeviceClose();
             Thread.Sleep(10);
-            DeviceOpen();
-            if(!SendMsg(Send_hexBool, Msg,b0D,b0A)) return null;
+            if (!DeviceOpen()) return "error";
+            if (!SendMsg(Send_hexBool, Msg,b0D,b0A)) return null;
             string str = RecieveMsg(Recive_hexBool,RTimeOut);
             DeviceClose();
             return str;
@@ -172,7 +173,7 @@ namespace CMNCOM
             string StrCKS = GetCKSByType(Msg, CKSType, StartFromIndex, EndToIndex);
             DeviceClose();
             Thread.Sleep(10);
-            DeviceOpen();          
+            if (!DeviceOpen()) return "error";
             if (!SendMsg(true, Msg + StrCKS, false, false)) return null;
             string str = RecieveMsg(true, RTimeOut);
             DeviceClose();
@@ -228,20 +229,29 @@ namespace CMNCOM
         {
             string str = null;                             
             int inti = 0,ByteNum = 0;
-            do
+            try
             {
-                ByteNum = DeviceUI.ComDevice.BytesToRead;
-                Thread.Sleep(10);
-                inti += 1;
-                //Console.WriteLine("inti："+inti);
-                //15S
+                do
+                {
+                    ByteNum = DeviceUI.ComDevice.BytesToRead;
+                    Thread.Sleep(10);
+                    inti += 1;
+                    Console.WriteLine("inti："+inti);
+                    //15S
+                }
+                while ((ByteNum == 0) && (inti < timeout * 40));
+                if (ByteNum == 0)
+                {
+                    if (timeout != 1) MessageBox.Show("读取数据包个数为0，等待超时！(" + timeout + "S)", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                    return str;
+                }
             }
-            while ((ByteNum == 0) && (inti < timeout*40));
-            if (ByteNum == 0)
+            catch (Exception ex)
             {
-                if (timeout!=1) MessageBox.Show("读取数据包个数为0，等待超时！("+ timeout + "S)", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
-                return str;
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                return null;
             }
+            
             Thread.Sleep(500);
             try
             {
@@ -264,10 +274,10 @@ namespace CMNCOM
                     }
                 }
             }
-            catch (TimeoutException)
+            catch (Exception ex)
             {
-                MessageBox.Show("读取数据包个数包个数不为0，但处理超时！", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
-                return str;
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);               
+                return null;
             }
             return str;
         }     
@@ -283,13 +293,19 @@ namespace CMNCOM
             return RecieveMsg(hexBool, 1);
         }
     
-        private void DeviceOpen()
+        private bool DeviceOpen()
         {
             try
             {
-                 if (!DeviceUI.ComDevice.IsOpen) DeviceUI.ComDevice.Open();
+                Console.WriteLine("DeviceOpen...");
+                if (!DeviceUI.ComDevice.IsOpen) DeviceUI.ComDevice.Open();
+                return true;
             }
-            catch { }
+            catch
+            {
+                Console.WriteLine(DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription + ":\rCOM无法打开，请检查！\r");
+                return false;
+            }
             
         }
  
