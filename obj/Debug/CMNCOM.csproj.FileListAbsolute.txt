@@ -22,7 +22,6 @@ D:\GitHub\Visual_Studio_Study\CMNCOM\CMNCOM\bin\Debug\CMNCOM.dll
 D:\GitHub\Visual_Studio_Study\CMNCOM\CMNCOM\obj\Debug\CMNCOM.dll
 D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\CMNCOM.XML
 D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\CMNCOM.pdb
-D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\getChkSum.dll
 D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\getChkSum.pdb
 D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\getChkSum.xml
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.csprojResolveAssemblyReference.cache
@@ -34,3 +33,4 @@ D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.csproj.GenerateResource.Cache
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.pdb
 D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\CMNCOM.dll
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.dll
+D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\getChkSum.dll

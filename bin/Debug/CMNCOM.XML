@@ -114,6 +114,19 @@
             <param name="b0A"></param>
             <returns></returns>
         </member>
+        <member name="M:CMNCOM.EMoudle.SendReciveMsg_C(System.Boolean,System.String,System.Boolean,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Send Message and recieve via COM continuely with no deive open and close every time
+            适用于需要判断接收数据超时提醒的情况
+            </summary>
+            <param name="Send_hexBool"></param>
+            <param name="Msg"></param>
+            <param name="Recive_hexBool"></param>
+            <param name="RTimeOut"></param>
+            <param name="b0D"></param>
+            <param name="b0A"></param>
+            <returns></returns>
+        </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.String,System.Int32,System.String,System.Int32,System.Int32)">
             <summary>
             适用于需要判断接收数据超时提醒的情况
@@ -153,6 +166,17 @@
             </summary>
             <param name="hexBool">代表发送的字符串是否为Hex</param>
             <returns>返回字符串类型的接收到的数据</returns>
+        </member>
+        <member name="M:CMNCOM.EMoudle.DeviceOpen">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CMNCOM.EMoudle.DeviceClose">
+            <summary>
+            
+            </summary>
         </member>
         <member name="M:CMNCOM.Program.Main">
             <summary>

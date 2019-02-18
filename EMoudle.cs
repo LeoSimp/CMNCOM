@@ -114,10 +114,11 @@ namespace CMNCOM
         public string SendReciveMsg(bool Send_hexBool, string Msg,bool Recive_hexBool, bool b0D, bool b0A)
         {
             DeviceClose();
-            Thread.Sleep(10);
+            Thread.Sleep(100);
             if (!DeviceOpen()) return "error";
             if (!SendMsg(Send_hexBool, Msg, b0D, b0A)) return null;
             string str = RecieveMsg(Recive_hexBool);
+            Thread.Sleep(100);
             DeviceClose();
             return str;
         }
@@ -150,14 +151,33 @@ namespace CMNCOM
         public string SendReciveMsg(bool Send_hexBool, string Msg, bool Recive_hexBool,int RTimeOut, bool b0D, bool b0A)
         {
             DeviceClose();
-            Thread.Sleep(10);
+            Thread.Sleep(100);
             if (!DeviceOpen()) return "error";
             if (!SendMsg(Send_hexBool, Msg,b0D,b0A)) return null;
             string str = RecieveMsg(Recive_hexBool,RTimeOut);
+            Thread.Sleep(100);
             DeviceClose();
             return str;
         }
-       
+
+        /// <summary>
+        /// Send Message and recieve via COM continuely with no deive open and close every time
+        /// 适用于需要判断接收数据超时提醒的情况
+        /// </summary>
+        /// <param name="Send_hexBool"></param>
+        /// <param name="Msg"></param>
+        /// <param name="Recive_hexBool"></param>
+        /// <param name="RTimeOut"></param>
+        /// <param name="b0D"></param>
+        /// <param name="b0A"></param>
+        /// <returns></returns>
+        public string SendReciveMsg_C(bool Send_hexBool, string Msg, bool Recive_hexBool, int RTimeOut, bool b0D, bool b0A)
+        {           
+            if (!SendMsg(Send_hexBool, Msg, b0D, b0A)) return null;
+            string str = RecieveMsg(Recive_hexBool, RTimeOut);
+            return str;
+        }
+
         /// <summary>
         /// 适用于需要判断接收数据超时提醒的情况
         /// 适用于需要加CHKSUM情况
@@ -172,10 +192,11 @@ namespace CMNCOM
         {
             string StrCKS = GetCKSByType(Msg, CKSType, StartFromIndex, EndToIndex);
             DeviceClose();
-            Thread.Sleep(10);
+            Thread.Sleep(100);
             if (!DeviceOpen()) return "error";
             if (!SendMsg(true, Msg + StrCKS, false, false)) return null;
             string str = RecieveMsg(true, RTimeOut);
+            Thread.Sleep(100);
             DeviceClose();
             return str;
         }
@@ -236,8 +257,8 @@ namespace CMNCOM
                     ByteNum = DeviceUI.ComDevice.BytesToRead;
                     Thread.Sleep(10);
                     inti += 1;
-                    Console.WriteLine("inti："+inti);
-                    //15S
+                    //Console.WriteLine("inti："+inti);
+                    
                 }
                 while ((ByteNum == 0) && (inti < timeout * 40));
                 if (ByteNum == 0)
@@ -292,8 +313,11 @@ namespace CMNCOM
         {
             return RecieveMsg(hexBool, 1);
         }
-    
-        private bool DeviceOpen()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool DeviceOpen()
         {
             try
             {
@@ -308,11 +332,20 @@ namespace CMNCOM
             }
             
         }
- 
-        private void DeviceClose()
+        /// <summary>
+        /// 
+        /// </summary>
+        public void DeviceClose()
         {
-            if (DeviceUI.ComDevice.IsOpen)
-            DeviceUI.ComDevice.Close();
+            try
+            {
+                if (DeviceUI.ComDevice.IsOpen)
+                    DeviceUI.ComDevice.Close();
+            } catch 
+            {
+                Console.WriteLine(DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription + ":\rCOM无法关闭，请检查！\r");
+            }
+         
         }
 
         private static byte[] HexStringToByteArray(string s)

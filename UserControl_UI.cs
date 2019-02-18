@@ -59,7 +59,8 @@ namespace CMNCOM
             "43000",
             "56000",
             "57600",
-            "115200"});
+            "115200",
+            "128000"});
             this.drpParity.Items.AddRange(new object[] {
             "None",
             "Odd",
