@@ -51,28 +51,41 @@
             
             </summary>
         </member>
-        <member name="M:CMNCOM.EMoudle.SendMsg(System.Boolean,System.String)">
-            <summary>
-            适用于默认发送不带回车和换行
-            </summary>
-            <param name="hexBool"></param>
-            <param name="Msg"></param>
-            <returns></returns>
-        </member>
         <member name="M:CMNCOM.EMoudle.SendMsg(System.Boolean,System.String,System.Boolean,System.Boolean)">
             <summary>
-            发送可配置带回车和换行
-            Send完直接关闭COM，适用于无需接收数据返回的情况，比如Scanner Stop
+            适用于无需接收数据返回的情况
             </summary>
             <param name="hexBool">代表发送的字符串是否为Hex</param>
             <param name="Msg">代表发送的字符串</param>
             <param name="b0D"></param>
             <param name="b0A"></param>
         </member>
+        <member name="M:CMNCOM.EMoudle.SendMsg(System.Boolean,System.String)">
+            <summary>
+            SendMsg精简版，默认尾部不添加0D或0A
+            </summary>
+            <param name="hexBool"></param>
+            <param name="Msg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean,System.Int32)">
+            <summary>
+            接收数据包个数为0时，等待超时会提醒
+            </summary>
+            <param name="hexBool">代表发送的字符串是否为Hex</param>
+            <param name="timeout">代表接收串口数据的最大超时时间(S)</param>
+            <returns>返回字符串类型的接收到的数据</returns>
+        </member>
+        <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean)">
+            <summary>
+            RecieveMsg精简版，接收数据包个数为0时，最多只等待1S，且超时不提醒
+            </summary>
+            <param name="hexBool">代表发送的字符串是否为Hex</param>
+            <returns>返回字符串类型的接收到的数据</returns>
+        </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.Boolean,System.String,System.Boolean)">
             <summary>
-            适用于默认发送不带回车和换行
-            适用于不需要判断接收数据超时提醒的情况，最多只等待1S，且超时不提醒
+            SendMsg精简版+RecieveMsg精简版，默认不发送回车换行和接收超时不提醒
             </summary>
             <param name="Send_hexBool"></param>
             <param name="Msg"></param>
@@ -81,8 +94,7 @@
         </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.Boolean,System.String,System.Boolean,System.Boolean,System.Boolean)">
             <summary>
-            Send Message and recieve via COM
-            适用于不需要判断接收数据超时提醒的情况，最多只等待1S，且超时不提醒
+             SendMsg+RecieveMsg精简版，可发送回车换行和接收超时不提醒
             </summary>
             <param name="Send_hexBool"></param>
             <param name="Msg"></param>
@@ -92,8 +104,7 @@
         </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.Boolean,System.String,System.Boolean,System.Int32)">
             <summary>
-            适用于默认发送不带回车和换行
-            适用于需要判断接收数据超时提醒的情况
+            SendMsg精简版+RecieveMsg，默认不发送回车换行和可接收超时提醒
             </summary>
             <param name="Send_hexBool"></param>
             <param name="Msg"></param>
@@ -103,21 +114,7 @@
         </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.Boolean,System.String,System.Boolean,System.Int32,System.Boolean,System.Boolean)">
             <summary>
-            Send Message and recieve via COM
-            适用于需要判断接收数据超时提醒的情况
-            </summary>
-            <param name="Send_hexBool"></param>
-            <param name="Msg"></param>
-            <param name="Recive_hexBool"></param>
-            <param name="RTimeOut"></param>
-            <param name="b0D"></param>
-            <param name="b0A"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CMNCOM.EMoudle.SendReciveMsg_C(System.Boolean,System.String,System.Boolean,System.Int32,System.Boolean,System.Boolean)">
-            <summary>
-            Send Message and recieve via COM continuely with no deive open and close every time
-            适用于需要判断接收数据超时提醒的情况
+            SendMsg+RecieveMsg，可发送回车换行和可接收超时提醒
             </summary>
             <param name="Send_hexBool"></param>
             <param name="Msg"></param>
@@ -129,8 +126,7 @@
         </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.String,System.Int32,System.String,System.Int32,System.Int32)">
             <summary>
-            适用于需要判断接收数据超时提醒的情况
-            适用于需要加CHKSUM情况
+            Hex模式，可加CHKSUM，SendMsg精简版+RecieveMsg，默认不发送回车换行和可接收超时提醒
             </summary>
             <param name="Msg"></param>
             <param name="RTimeOut"></param>
@@ -141,8 +137,7 @@
         </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.String,System.String,System.Int32,System.Int32)">
             <summary>
-            适用于不需要判断接收数据超时提醒的情况
-            适用于需要加CHKSUM情况
+            Hex模式，可加CHKSUM，SendMsg精简版+RecieveMsg精简版，默认不发送回车换行和不接收超时提醒
             </summary>
             <param name="Msg"></param>
             <param name="CKSType"></param>
@@ -150,32 +145,15 @@
             <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
             <returns></returns>
         </member>
-        <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean,System.Int32)">
-            <summary>
-            Recieve Message via COM，超时无数据返回报错提醒
-            收取数据时不宜频繁打开关闭COM，容易造成收到的数据不完整
-            </summary>
-            <param name="hexBool">代表发送的字符串是否为Hex</param>
-            <param name="timeout">代表接收串口数据的最大超时时间(S)</param>
-            <returns>返回字符串类型的接收到的数据</returns>
-        </member>
-        <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean)">
-            <summary>
-            Recieve Message via COM,数据包个数为0时，最多只等待1S，且超时不提醒，
-            收取数据时不宜频繁打开关闭COM，容易造成收到的数据不完整
-            </summary>
-            <param name="hexBool">代表发送的字符串是否为Hex</param>
-            <returns>返回字符串类型的接收到的数据</returns>
-        </member>
         <member name="M:CMNCOM.EMoudle.DeviceOpen">
             <summary>
-            
+             检查Device 是否Open，未Open自动Open
             </summary>
             <returns></returns>
         </member>
         <member name="M:CMNCOM.EMoudle.DeviceClose">
             <summary>
-            
+            检查Device Close，未Close自动Close
             </summary>
         </member>
         <member name="M:CMNCOM.Program.Main">

@@ -46,13 +46,13 @@ namespace CMNCOM
                 {
                     using (StreamReader sr = new StreamReader(path, System.Text.Encoding.GetEncoding("GB2312")))
                     {
-                        Conf_Set(sr.ReadLine(),checkBox1,textBox1,button1);
-                        Conf_Set(sr.ReadLine(), checkBox2, textBox2, button2);
-                        Conf_Set(sr.ReadLine(), checkBox3, textBox3, button3);
-                        Conf_Set(sr.ReadLine(), checkBox4, textBox4, button4);
-                        Conf_Set(sr.ReadLine(), checkBox5, textBox5, button5);
-                        Conf_Set(sr.ReadLine(), checkBox6, textBox6, button6);
-                        Conf_Set(sr.ReadLine(), checkBox7, textBox7, button7);
+                        Set_CMD(sr.ReadLine(),checkBox1,textBox1,button1);
+                        Set_CMD(sr.ReadLine(), checkBox2, textBox2, button2);
+                        Set_CMD(sr.ReadLine(), checkBox3, textBox3, button3);
+                        Set_CMD(sr.ReadLine(), checkBox4, textBox4, button4);
+                        Set_CMD(sr.ReadLine(), checkBox5, textBox5, button5);
+                        Set_CMD(sr.ReadLine(), checkBox6, textBox6, button6);
+                        Set_CMD(sr.ReadLine(), checkBox7, textBox7, button7);
                     }
                 }           
             }
@@ -62,10 +62,10 @@ namespace CMNCOM
 
         }
 
-        private void Conf_Set(string str,CheckBox cb, TextBox tb,Button btn)
+        private void Set_CMD(string str,CheckBox cb, TextBox tb,Button btn)
         {
             string[] rst = null;
-            rst = str.Split(',');
+            rst = str.Split('|');
             if (rst.Length == 3)
             {
                 if (rst[0].ToUpper() == "H") { cb.Checked = true; }
@@ -80,19 +80,20 @@ namespace CMNCOM
             }
         }
 
-        private string Sen_Conf(CheckBox cb, TextBox tb, Button btn)
+        private string Read_CMD(CheckBox cb, TextBox tb, Button btn)
         {
             string[] rst = new string[3];string str = null;
             if (cb.Checked) { rst[0] = "H"; }
             else { rst[0] = "A"; }
             rst[1] = tb.Text;rst[2] = btn.Text;
-            str = rst[0] + "," + rst[1] + "," + rst[2];
+            str = rst[0] + "|" + rst[1] + "|" + rst[2];
             return str;
         }
 
         private void FormDiag_FormClosing(object sender, FormClosingEventArgs e)
         {
             Conf_Save();
+            EMoudleInstance.DeviceClose();
         }
 
         private void Conf_Save()
@@ -105,13 +106,13 @@ namespace CMNCOM
                 using (StreamWriter sw = new StreamWriter(path, false, System.Text.Encoding.GetEncoding("GB2312")))
                     {
                         string rst = "";
-                        rst += Sen_Conf(checkBox1, textBox1, button1) + "\r\n";
-                        rst += Sen_Conf(checkBox2, textBox2, button2) + "\r\n";
-                        rst += Sen_Conf(checkBox3, textBox3, button3) + "\r\n";
-                        rst += Sen_Conf(checkBox4, textBox4, button4) + "\r\n";
-                        rst += Sen_Conf(checkBox5, textBox5, button5) + "\r\n";
-                        rst += Sen_Conf(checkBox6, textBox6, button6) + "\r\n";
-                        rst += Sen_Conf(checkBox7, textBox7, button7) + "\r\n";
+                        rst += Read_CMD(checkBox1, textBox1, button1) + "\r\n";
+                        rst += Read_CMD(checkBox2, textBox2, button2) + "\r\n";
+                        rst += Read_CMD(checkBox3, textBox3, button3) + "\r\n";
+                        rst += Read_CMD(checkBox4, textBox4, button4) + "\r\n";
+                        rst += Read_CMD(checkBox5, textBox5, button5) + "\r\n";
+                        rst += Read_CMD(checkBox6, textBox6, button6) + "\r\n";
+                        rst += Read_CMD(checkBox7, textBox7, button7) + "\r\n";
                         sw.Write(rst);
 
                     }
@@ -130,37 +131,14 @@ namespace CMNCOM
         {
             ButtonSend(cb, tb, 1);
         }
-        private void ButtonSend1(CheckBox cb, TextBox tb,int TimeOut)
-        {
-            if (cbCKS.SelectedItem.ToString() == "None")
-            {
-                tbCKS_Value.Text = "";               
-            } else
-            {
-                int StartFromIndex = 2*Convert.ToInt32(tbStartFromIndex.Text)-2;
-                int EndToIndex = 2*Convert.ToInt32(tbEndToIndex.Text)-2;
-                if (StartFromIndex < 0) StartFromIndex = 0;
-                if (EndToIndex < 0) EndToIndex = 0;
-                string data = tb.Text.Replace(" ", "");
-                data = data.Substring(StartFromIndex, data.Length - EndToIndex - StartFromIndex);
 
-                switch (cbCKS.SelectedItem.ToString())
-                {
-                    case "BCC":
-                        tbCKS_Value.Text = getChkSum.EModule.BCC(data);
-                        break;
-                    case "LRC":
-                        tbCKS_Value.Text = getChkSum.EModule.LRC(data);
-                        break;
-                    default:
-                        tbCKS_Value.Text = "";
-                        break;
-                }              
-            }
+        private void ButtonSend_NoRecive(CheckBox cb, TextBox tb)
+        {
+            tbCKS_Value.Text = EMoudleInstance.GetCKSByType(tb.Text, cbCKS.SelectedItem.ToString(), Convert.ToInt32(tbStartFromIndex.Text), Convert.ToInt32(tbEndToIndex.Text));
             WriteLog(rtb_ReciveMsg, "Send: " + tb.Text + " " + tbCKS_Value.Text);
             rtb_ReciveMsg.Update();
-            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut, cb0D.Checked, cb0A.Checked);
-            WriteLog(rtb_ReciveMsg, "Recieve: " + rst + "\r\n");
+            EMoudleInstance.SendMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb0D.Checked, cb0A.Checked);           
+            EMoudleInstance.DeviceClose();
         }
 
         private void ButtonSend(CheckBox cb, TextBox tb, int TimeOut)
@@ -170,6 +148,7 @@ namespace CMNCOM
             rtb_ReciveMsg.Update();
             string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut, cb0D.Checked, cb0A.Checked);
             WriteLog(rtb_ReciveMsg, "Recieve: " + rst + "\r\n");
+            EMoudleInstance.DeviceClose();
         }
 
         #region 利用委托解决跨线程调用问题方法(WriteLog)
@@ -232,6 +211,7 @@ namespace CMNCOM
         private void ModifyBtnText(Button btn)
         {
             string str = Interaction.InputBox("请输入右边按钮的注释文字", "提示", btn.Text, -1, -1);  //-1表示在屏幕的中间  
+
             if (!string.IsNullOrEmpty(str)) btn.Text = str;      
         }
 
@@ -283,6 +263,44 @@ namespace CMNCOM
             {
                 cb_R_HEX.Enabled = true;
                 cb_T_HEX.Enabled = true;
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox1);
+        }
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox2);
+        }
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox3);
+        }
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox4);
+        }
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox5);
+        }
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox6);
+        }
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+            Checktb_Text(textBox7);
+        }
+        private void Checktb_Text(TextBox tb)
+        {
+            if (tb.Text.Contains("|"))
+            {
+                MessageBox.Show("命令暂不支持保存含有 '|'的字符串！！");
+                tb.Text = tb.Text.Replace("|", "");
+                tb.Focus();
             }
         }
     }

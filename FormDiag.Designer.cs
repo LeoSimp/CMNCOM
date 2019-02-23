@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.rtb_ReciveMsg = new System.Windows.Forms.RichTextBox();
             this.tb_SendMsg = new System.Windows.Forms.TextBox();
             this.cb_T_HEX = new System.Windows.Forms.CheckBox();
@@ -61,7 +60,6 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.cb0D = new System.Windows.Forms.CheckBox();
             this.cb0A = new System.Windows.Forms.CheckBox();
-            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.cbCKS = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -135,6 +133,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(228, 25);
             this.textBox1.TabIndex = 62;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.textBox1.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
             // 
             // checkBox1
@@ -219,6 +218,7 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(228, 25);
             this.textBox4.TabIndex = 89;
+            this.textBox4.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
             this.textBox4.DoubleClick += new System.EventHandler(this.textBox4_DoubleClick);
             // 
             // button1
@@ -320,6 +320,7 @@
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(228, 25);
             this.textBox6.TabIndex = 80;
+            this.textBox6.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
             this.textBox6.DoubleClick += new System.EventHandler(this.textBox6_DoubleClick);
             // 
             // textBox5
@@ -331,6 +332,7 @@
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(228, 25);
             this.textBox5.TabIndex = 78;
+            this.textBox5.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
             this.textBox5.DoubleClick += new System.EventHandler(this.textBox5_DoubleClick);
             // 
             // checkBox3
@@ -352,6 +354,7 @@
             this.textBox7.Name = "textBox7";
             this.textBox7.Size = new System.Drawing.Size(228, 25);
             this.textBox7.TabIndex = 79;
+            this.textBox7.TextChanged += new System.EventHandler(this.textBox7_TextChanged);
             this.textBox7.DoubleClick += new System.EventHandler(this.textBox7_DoubleClick);
             // 
             // textBox3
@@ -363,6 +366,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(228, 25);
             this.textBox3.TabIndex = 76;
+            this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             this.textBox3.DoubleClick += new System.EventHandler(this.textBox3_DoubleClick);
             // 
             // checkBox4
@@ -418,6 +422,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(228, 25);
             this.textBox2.TabIndex = 66;
+            this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             this.textBox2.DoubleClick += new System.EventHandler(this.textBox2_DoubleClick);
             // 
             // cb0D
@@ -614,7 +619,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox cb0D;
         private System.Windows.Forms.CheckBox cb0A;
-        private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.ComboBox cbCKS;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;

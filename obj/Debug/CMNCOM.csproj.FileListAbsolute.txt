@@ -31,6 +31,6 @@ D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.SmplUsngForm.resources
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.UserControl_UI.resources
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.csproj.GenerateResource.Cache
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.pdb
+D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\getChkSum.dll
 D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\CMNCOM.dll
 D:\GitHub\MyDll\CMNCOM\CMNCOM\obj\Debug\CMNCOM.dll
-D:\GitHub\MyDll\CMNCOM\CMNCOM\bin\Debug\getChkSum.dll

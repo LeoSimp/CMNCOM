@@ -35,28 +35,19 @@ namespace CMNCOM
             DeviceUI.ComDevice.Close();
         }
 
-        /// <summary>
-        /// 适用于默认发送不带回车和换行
-        /// </summary>
-        /// <param name="hexBool"></param>
-        /// <param name="Msg"></param>
-        /// <returns></returns>
-        public bool SendMsg(bool hexBool, string Msg)
-        {
-           return SendMsg(hexBool, Msg, false, false);
-        }
+
 
         /// <summary>
-        /// 发送可配置带回车和换行
-        /// Send完直接关闭COM，适用于无需接收数据返回的情况，比如Scanner Stop
+        /// 适用于无需接收数据返回的情况
         /// </summary>
         /// <param name="hexBool">代表发送的字符串是否为Hex</param>
         /// <param name="Msg">代表发送的字符串</param>
         /// <param name="b0D"></param>
         /// <param name="b0A"></param>
-        public bool SendMsg(bool hexBool, string Msg,bool b0D,bool b0A)
+        public bool SendMsg(bool hexBool, string Msg, bool b0D, bool b0A)
         {
-            if (DeviceUI.ComDevice.IsOpen)
+
+            if (DeviceOpen())
             {
                 //MessageBox.Show("Pause", "Pause", MessageBoxButtons.OK);
                 if (hexBool)
@@ -74,7 +65,7 @@ namespace CMNCOM
                     return true;
                 }
                 else
-                {                  
+                {
                     if (b0D) Msg += "\r";
                     if (b0A) Msg += "\n";
                     DeviceUI.ComDevice.Write(Msg);
@@ -84,14 +75,103 @@ namespace CMNCOM
             else
             {
                 //MessageBox.Show("COM处于断开状态，请检查！", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
-                Console.WriteLine(DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription+":\rCOM处于断开状态，请检查！\r");
-                return false ;
+                Console.WriteLine(DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription + ":\rCOM处于断开状态，请检查！\r");
+                return false;
             }
         }
 
         /// <summary>
-        /// 适用于默认发送不带回车和换行
-        /// 适用于不需要判断接收数据超时提醒的情况，最多只等待1S，且超时不提醒
+        /// SendMsg精简版，默认尾部不添加0D或0A
+        /// </summary>
+        /// <param name="hexBool"></param>
+        /// <param name="Msg"></param>
+        /// <returns></returns>
+        public bool SendMsg(bool hexBool, string Msg)
+        {
+           return SendMsg(hexBool, Msg, false, false);
+        }
+
+      
+
+
+        /// <summary>
+        /// 接收数据包个数为0时，等待超时会提醒
+        /// </summary>
+        /// <param name="hexBool">代表发送的字符串是否为Hex</param>
+        /// <param name="timeout">代表接收串口数据的最大超时时间(S)</param>
+        /// <returns>返回字符串类型的接收到的数据</returns>
+        public string RecieveMsg(bool hexBool, int timeout)
+        {
+            if (timeout == 0 )
+            {
+                return null;
+            }
+            string str = null;
+            int inti = 0, ByteNum = 0;
+            try
+            {
+                do
+                {
+                    ByteNum = DeviceUI.ComDevice.BytesToRead;
+                    Thread.Sleep(10);
+                    inti += 1;
+                    //Console.WriteLine("inti："+inti);
+                }
+                while ((ByteNum == 0) && (inti < timeout * 40));
+                if (ByteNum == 0)
+                {
+                    if (timeout != 1) MessageBox.Show("读取数据包个数为0，等待超时！(" + timeout + "S)", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                    return str;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                return null;
+            }
+            Thread.Sleep(10); //为何要等待？
+            try
+            {
+                //string response = DeviceUI.ComDevice.ReadLine();//当返回值没有换行符时,就死了
+                if (hexBool)
+                {
+                    int buffersize = ByteNum;   //十六进制数的大小（可调整数字大小）
+                    byte[] buffer = new Byte[buffersize];   //创建缓冲区
+                    DeviceUI.ComDevice.Read(buffer, 0, buffersize);
+                    str = ByteArrayToHexString(buffer);
+                }
+                else
+                {
+                    while (DeviceUI.ComDevice.BytesToRead > 0)
+                    {
+                        Thread.Sleep(150);
+                        str += DeviceUI.ComDevice.ReadExisting();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                return null;
+            }
+            return str;
+        }
+
+        /// <summary>
+        /// RecieveMsg精简版，接收数据包个数为0时，最多只等待1S，且超时不提醒
+        /// </summary>
+        /// <param name="hexBool">代表发送的字符串是否为Hex</param>
+        /// <returns>返回字符串类型的接收到的数据</returns>
+        public string RecieveMsg(bool hexBool)
+        {
+            return RecieveMsg(hexBool, 1);
+        }
+
+
+
+
+        /// <summary>
+        /// SendMsg精简版+RecieveMsg精简版，默认不发送回车换行和接收超时不提醒
         /// </summary>
         /// <param name="Send_hexBool"></param>
         /// <param name="Msg"></param>
@@ -103,8 +183,7 @@ namespace CMNCOM
         }
 
         /// <summary>
-        /// Send Message and recieve via COM
-        /// 适用于不需要判断接收数据超时提醒的情况，最多只等待1S，且超时不提醒
+        ///  SendMsg+RecieveMsg精简版，可发送回车换行和接收超时不提醒
         /// </summary>
         /// <param name="Send_hexBool"></param>
         /// <param name="Msg"></param>
@@ -113,19 +192,13 @@ namespace CMNCOM
         /// <param name="b0A"></param>
         public string SendReciveMsg(bool Send_hexBool, string Msg,bool Recive_hexBool, bool b0D, bool b0A)
         {
-            DeviceClose();
-            Thread.Sleep(100);
-            if (!DeviceOpen()) return "error";
             if (!SendMsg(Send_hexBool, Msg, b0D, b0A)) return null;
             string str = RecieveMsg(Recive_hexBool);
-            Thread.Sleep(100);
-            DeviceClose();
             return str;
         }
 
         /// <summary>
-        /// 适用于默认发送不带回车和换行
-        /// 适用于需要判断接收数据超时提醒的情况
+        /// SendMsg精简版+RecieveMsg，默认不发送回车换行和可接收超时提醒
         /// </summary>
         /// <param name="Send_hexBool"></param>
         /// <param name="Msg"></param>
@@ -138,8 +211,7 @@ namespace CMNCOM
         }
 
         /// <summary>
-        /// Send Message and recieve via COM
-        /// 适用于需要判断接收数据超时提醒的情况
+        /// SendMsg+RecieveMsg，可发送回车换行和可接收超时提醒
         /// </summary>
         /// <param name="Send_hexBool"></param>
         /// <param name="Msg"></param>
@@ -150,72 +222,15 @@ namespace CMNCOM
         /// <returns></returns>
         public string SendReciveMsg(bool Send_hexBool, string Msg, bool Recive_hexBool,int RTimeOut, bool b0D, bool b0A)
         {
-            DeviceClose();
-            Thread.Sleep(100);
-            if (!DeviceOpen()) return "error";
             if (!SendMsg(Send_hexBool, Msg,b0D,b0A)) return null;
             string str = RecieveMsg(Recive_hexBool,RTimeOut);
-            Thread.Sleep(100);
-            DeviceClose();
             return str;
         }
 
-        /// <summary>
-        /// Send Message and recieve via COM continuely with no deive open and close every time
-        /// 适用于需要判断接收数据超时提醒的情况
-        /// </summary>
-        /// <param name="Send_hexBool"></param>
-        /// <param name="Msg"></param>
-        /// <param name="Recive_hexBool"></param>
-        /// <param name="RTimeOut"></param>
-        /// <param name="b0D"></param>
-        /// <param name="b0A"></param>
-        /// <returns></returns>
-        public string SendReciveMsg_C(bool Send_hexBool, string Msg, bool Recive_hexBool, int RTimeOut, bool b0D, bool b0A)
-        {           
-            if (!SendMsg(Send_hexBool, Msg, b0D, b0A)) return null;
-            string str = RecieveMsg(Recive_hexBool, RTimeOut);
-            return str;
-        }
 
-        /// <summary>
-        /// 适用于需要判断接收数据超时提醒的情况
-        /// 适用于需要加CHKSUM情况
-        /// </summary>
-        /// <param name="Msg"></param>
-        /// <param name="RTimeOut"></param>
-        /// <param name="CKSType"></param>
-        /// <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
-        /// <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
-        /// <returns></returns>
-        public string SendReciveMsg(string Msg, int RTimeOut, string CKSType, int StartFromIndex, int EndToIndex)
-        {
-            string StrCKS = GetCKSByType(Msg, CKSType, StartFromIndex, EndToIndex);
-            DeviceClose();
-            Thread.Sleep(100);
-            if (!DeviceOpen()) return "error";
-            if (!SendMsg(true, Msg + StrCKS, false, false)) return null;
-            string str = RecieveMsg(true, RTimeOut);
-            Thread.Sleep(100);
-            DeviceClose();
-            return str;
-        }
 
-        /// <summary>
-        /// 适用于不需要判断接收数据超时提醒的情况
-        /// 适用于需要加CHKSUM情况
-        /// </summary>
-        /// <param name="Msg"></param>
-        /// <param name="CKSType"></param>
-        /// <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
-        /// <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
-        /// <returns></returns>
-        public string SendReciveMsg(string Msg, string CKSType, int StartFromIndex, int EndToIndex)
-        {
-            return SendReciveMsg(Msg, 1, CKSType, StartFromIndex, EndToIndex);
-        }
 
-        internal string GetCKSByType(String Msg,string CKSType, int StartFromIndex, int EndToIndex)
+        internal string GetCKSByType(string Msg, string CKSType, int StartFromIndex, int EndToIndex)
         {
             string data = Msg.Replace(" ", "");
             StartFromIndex = 2 * StartFromIndex - 2;
@@ -239,91 +254,56 @@ namespace CMNCOM
             return StrCKS;
         }
 
-        /// <summary>
-        /// Recieve Message via COM，超时无数据返回报错提醒
-        /// 收取数据时不宜频繁打开关闭COM，容易造成收到的数据不完整
-        /// </summary>
-        /// <param name="hexBool">代表发送的字符串是否为Hex</param>
-        /// <param name="timeout">代表接收串口数据的最大超时时间(S)</param>
-        /// <returns>返回字符串类型的接收到的数据</returns>
-        public string RecieveMsg(bool hexBool, int timeout)
-        {
-            string str = null;                             
-            int inti = 0,ByteNum = 0;
-            try
-            {
-                do
-                {
-                    ByteNum = DeviceUI.ComDevice.BytesToRead;
-                    Thread.Sleep(10);
-                    inti += 1;
-                    //Console.WriteLine("inti："+inti);
-                    
-                }
-                while ((ByteNum == 0) && (inti < timeout * 40));
-                if (ByteNum == 0)
-                {
-                    if (timeout != 1) MessageBox.Show("读取数据包个数为0，等待超时！(" + timeout + "S)", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
-                    return str;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
-                return null;
-            }
-            
-            Thread.Sleep(500);
-            try
-            {
-                //string response = DeviceUI.ComDevice.ReadLine();//当返回值没有换行符时,就死了
-                
-                    
-                if (hexBool)
-                {
-                    int buffersize = ByteNum;   //十六进制数的大小（可调整数字大小）
-                    byte[] buffer = new Byte[buffersize];   //创建缓冲区
-                    DeviceUI.ComDevice.Read(buffer, 0, buffersize);
-                    str = ByteArrayToHexString(buffer);
-                }
-                else
-                {
-                    while (DeviceUI.ComDevice.BytesToRead > 0)
-                    {
-                        Thread.Sleep(150);
-                        str += DeviceUI.ComDevice.ReadExisting();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);               
-                return null;
-            }
-            return str;
-        }     
 
         /// <summary>
-        /// Recieve Message via COM,数据包个数为0时，最多只等待1S，且超时不提醒，
-        /// 收取数据时不宜频繁打开关闭COM，容易造成收到的数据不完整
+        /// Hex模式，可加CHKSUM，SendMsg精简版+RecieveMsg，默认不发送回车换行和可接收超时提醒
         /// </summary>
-        /// <param name="hexBool">代表发送的字符串是否为Hex</param>
-        /// <returns>返回字符串类型的接收到的数据</returns>
-        public string RecieveMsg(bool hexBool)
+        /// <param name="Msg"></param>
+        /// <param name="RTimeOut"></param>
+        /// <param name="CKSType"></param>
+        /// <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
+        /// <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
+        /// <returns></returns>
+        public string SendReciveMsg(string Msg, int RTimeOut, string CKSType, int StartFromIndex, int EndToIndex)
         {
-            return RecieveMsg(hexBool, 1);
+            string StrCKS = GetCKSByType(Msg, CKSType, StartFromIndex, EndToIndex);
+            if (!SendMsg(true, Msg + StrCKS)) return null;
+            string str = RecieveMsg(true, RTimeOut);
+            return str;
         }
+
         /// <summary>
-        /// 
+        /// Hex模式，可加CHKSUM，SendMsg精简版+RecieveMsg精简版，默认不发送回车换行和不接收超时提醒
+        /// </summary>
+        /// <param name="Msg"></param>
+        /// <param name="CKSType"></param>
+        /// <param name="StartFromIndex">开始字节Index，>=1，=1代表无Head</param>
+        /// <param name="EndToIndex">尾字节Index，>=1，=1代表无Tail,（1,1）代表全长</param>
+        /// <returns></returns>
+        public string SendReciveMsg(string Msg, string CKSType, int StartFromIndex, int EndToIndex)
+        {
+            return SendReciveMsg(Msg, 1, CKSType, StartFromIndex, EndToIndex);
+        }
+
+  
+
+      
+        /// <summary>
+        ///  检查Device 是否Open，未Open自动Open
         /// </summary>
         /// <returns></returns>
         public bool DeviceOpen()
         {
             try
             {
-                Console.WriteLine("DeviceOpen...");
-                if (!DeviceUI.ComDevice.IsOpen) DeviceUI.ComDevice.Open();
+
+                if (!DeviceUI.ComDevice.IsOpen)
+                {
+                    Console.WriteLine("DeviceOpen...");
+                    DeviceUI.ComDevice.Open();                  
+                }       
                 return true;
+                  
             }
             catch
             {
@@ -332,8 +312,9 @@ namespace CMNCOM
             }
             
         }
+
         /// <summary>
-        /// 
+        /// 检查Device Close，未Close自动Close
         /// </summary>
         public void DeviceClose()
         {
