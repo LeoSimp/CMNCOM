@@ -49,6 +49,8 @@ namespace CMNCOM
 
             if (DeviceOpen())
             {
+                DeviceUI.ComDevice.ReadExisting();
+                DeviceUI.ComDevice.DiscardInBuffer();
                 //MessageBox.Show("Pause", "Pause", MessageBoxButtons.OK);
                 if (hexBool)
                 {
@@ -91,8 +93,83 @@ namespace CMNCOM
            return SendMsg(hexBool, Msg, false, false);
         }
 
-      
 
+        /// <summary>
+        /// 接收数据包个数为0时，等待超时会提醒,可配置接收消息前延时，避免数据接收不完全
+        /// </summary>
+        /// <param name="hexBool">代表发送的字符串是否为Hex</param>
+        /// <param name="timeout">代表接收串口数据的最大超时时间(S)</param>
+        /// <param name="delayms_BeforeRecieve"></param>
+        /// <returns>返回字符串类型的接收到的数据</returns>
+        public string RecieveMsg(bool hexBool, int timeout,int delayms_BeforeRecieve)
+        {
+            if (timeout == 0)
+            {
+                return null;
+            }
+            string str = null;
+            int inti = 0, ByteNum = 0, TempByteNum = 0;
+            int ByteNum_No_Increase_Times = 0;
+            try
+            {
+                do
+                {
+                    TempByteNum = DeviceUI.ComDevice.BytesToRead;
+                    if (TempByteNum !=0)
+                    {
+                        if (TempByteNum > ByteNum)
+                        {
+                            ByteNum = TempByteNum;
+                            ByteNum_No_Increase_Times = 0;
+                        }
+                        else
+                        {
+                            ByteNum_No_Increase_Times += 1;
+                        }
+                    }                   
+                    Thread.Sleep(3);
+                    inti += 1;
+                    //Console.WriteLine("ByteNum：" + ByteNum); //ByteNum从0往上递增,如果0.2S内没有新增ByteNumber,证明接受数据完毕
+                }
+                while ((ByteNum_No_Increase_Times <66 ) && (inti < timeout * 400));
+                if (ByteNum == 0)
+                {
+                    if (timeout != 1) Console.WriteLine("读取数据包个数为0，等待超时！(" + timeout + "S)", DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                    return str;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                return null;
+            }
+            //Thread.Sleep(delayms_BeforeRecieve); 
+            try
+            {
+                //string response = DeviceUI.ComDevice.ReadLine();//当返回值没有换行符时,就死了
+                if (hexBool)
+                {
+                    int buffersize = ByteNum;   //十六进制数的大小（可调整数字大小）
+                    byte[] buffer = new Byte[buffersize];   //创建缓冲区
+                    DeviceUI.ComDevice.Read(buffer, 0, buffersize);
+                    str = ByteArrayToHexString(buffer);
+                }
+                else
+                {
+                    while (DeviceUI.ComDevice.BytesToRead > 0)
+                    {
+                        Thread.Sleep(10);
+                        str += DeviceUI.ComDevice.ReadExisting();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace, DeviceUI.MoudleConnString_Ext + " - " + DeviceUI.ComDevice.DeviceDiscription);
+                return null;
+            }
+            return str;
+        }
 
         /// <summary>
         /// 接收数据包个数为0时，等待超时会提醒
@@ -210,6 +287,23 @@ namespace CMNCOM
             return SendReciveMsg(Send_hexBool, Msg, Recive_hexBool, RTimeOut, false, false);
         }
 
+        /// <summary>
+        /// SendMsg+RecieveMsg，可发送回车换行和可接收超时提醒,可配置接收消息前延时，避免数据接收不完全
+        /// </summary>
+        /// <param name="Send_hexBool"></param>
+        /// <param name="Msg"></param>
+        /// <param name="Recive_hexBool"></param>
+        /// <param name="RTimeOut"></param>
+        /// <param name="delayms_BeforeRecieve"></param>
+        /// <param name="b0D"></param>
+        /// <param name="b0A"></param>
+        /// <returns></returns>
+        public string SendReciveMsg(bool Send_hexBool, string Msg, bool Recive_hexBool, int RTimeOut,int delayms_BeforeRecieve, bool b0D, bool b0A)
+        {
+            if (!SendMsg(Send_hexBool, Msg, b0D, b0A)) return null;
+            string str = RecieveMsg(Recive_hexBool, RTimeOut, delayms_BeforeRecieve);
+            return str;
+        }
         /// <summary>
         /// SendMsg+RecieveMsg，可发送回车换行和可接收超时提醒
         /// </summary>

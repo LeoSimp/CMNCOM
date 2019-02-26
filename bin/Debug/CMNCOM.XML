@@ -68,6 +68,15 @@
             <param name="Msg"></param>
             <returns></returns>
         </member>
+        <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            接收数据包个数为0时，等待超时会提醒,可配置接收消息前延时，避免数据接收不完全
+            </summary>
+            <param name="hexBool">代表发送的字符串是否为Hex</param>
+            <param name="timeout">代表接收串口数据的最大超时时间(S)</param>
+            <param name="delayms_BeforeRecieve"></param>
+            <returns>返回字符串类型的接收到的数据</returns>
+        </member>
         <member name="M:CMNCOM.EMoudle.RecieveMsg(System.Boolean,System.Int32)">
             <summary>
             接收数据包个数为0时，等待超时会提醒
@@ -110,6 +119,19 @@
             <param name="Msg"></param>
             <param name="Recive_hexBool"></param>
             <param name="RTimeOut"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.Boolean,System.String,System.Boolean,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            SendMsg+RecieveMsg，可发送回车换行和可接收超时提醒,可配置接收消息前延时，避免数据接收不完全
+            </summary>
+            <param name="Send_hexBool"></param>
+            <param name="Msg"></param>
+            <param name="Recive_hexBool"></param>
+            <param name="RTimeOut"></param>
+            <param name="delayms_BeforeRecieve"></param>
+            <param name="b0D"></param>
+            <param name="b0A"></param>
             <returns></returns>
         </member>
         <member name="M:CMNCOM.EMoudle.SendReciveMsg(System.Boolean,System.String,System.Boolean,System.Int32,System.Boolean,System.Boolean)">

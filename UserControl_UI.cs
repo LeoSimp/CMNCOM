@@ -111,7 +111,7 @@ namespace CMNCOM
                 SelectOne(drpDataBits, ComDevice.userDataBits);
                 SelectOne(drpStopBits, ComDevice.userStopBits);
                 ComDevice.DtrEnable = true;
-                if (openCom) ComDevice.Open(); 
+                //if (openCom) ComDevice.Open(); 
                
             }            
             catch (Exception ex)

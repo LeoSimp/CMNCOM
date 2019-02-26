@@ -129,7 +129,9 @@ namespace CMNCOM
 
         private void ButtonSend(CheckBox cb,TextBox tb)
         {
+
             ButtonSend(cb, tb, 1);
+          
         }
 
         private void ButtonSend_NoRecive(CheckBox cb, TextBox tb)
@@ -143,22 +145,34 @@ namespace CMNCOM
 
         private void ButtonSend(CheckBox cb, TextBox tb, int TimeOut)
         {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
             tbCKS_Value.Text = EMoudleInstance.GetCKSByType(tb.Text, cbCKS.SelectedItem.ToString(), Convert.ToInt32(tbStartFromIndex.Text), Convert.ToInt32(tbEndToIndex.Text));
             WriteLog(rtb_ReciveMsg, "Send: " + tb.Text + " " + tbCKS_Value.Text);
             rtb_ReciveMsg.Update();
-            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut, cb0D.Checked, cb0A.Checked);
+            string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut,500, cb0D.Checked, cb0A.Checked);
             WriteLog(rtb_ReciveMsg, "Recieve: " + rst + "\r\n");
-            EMoudleInstance.DeviceClose();
+            //EMoudleInstance.DeviceClose();
+            stopwatch.Stop();
+            TimeSpan timeSpan = stopwatch.Elapsed;
+            double milliseconds = timeSpan.TotalMilliseconds;
+            Console.WriteLine("milliseconds: " + milliseconds.ToString());
         }
 
         #region 利用委托解决跨线程调用问题方法(WriteLog)
-        private delegate void WriteLogUnSafe(RichTextBox logRichTxt, string strLog);
+        //private delegate void WriteLogUnSafe(RichTextBox logRichTxt, string strLog);
         private static void WriteLog(RichTextBox logRichTxt, string strLog)
         {
             if (logRichTxt.InvokeRequired)
             {
-                WriteLogUnSafe InvokeWriteLog = new WriteLogUnSafe(WriteLog);
-                logRichTxt.Invoke(InvokeWriteLog, new object[] { logRichTxt, strLog });
+                //WriteLogUnSafe InvokeWriteLog = new WriteLogUnSafe(WriteLog);
+                //logRichTxt.Invoke(InvokeWriteLog, new object[] { logRichTxt, strLog });
+                logRichTxt.Invoke((MethodInvoker) delegate ()
+                {
+                    WriteLog(logRichTxt, strLog);
+                }
+
+                );
             }
             else
             {

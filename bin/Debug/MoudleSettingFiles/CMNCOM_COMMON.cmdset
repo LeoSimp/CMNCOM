@@ -1,7 +1,7 @@
-A|4C4D|Send
+H|4C4D|Send
 A|Func:Imp CPD;:Aper FAST,1;:Freq 100;:Volt 1;:Trig:Del 0|LCR_Set_Conf
 H|FE010000030003FFFEFF|HL0303
 H|FE 01 00 00 01 00 01 FF FE FF|HL01_01
 H|16540D|Scanner_Tri
-H|03E1|Send
-H|74 75 72 6E 4F 6E 4C 45 44 0D|Send
+A|getProdData 2|Send
+A|setProdData 2 1234567890123456|Send
