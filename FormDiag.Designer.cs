@@ -69,6 +69,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.tbCKS_Value = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cb_R_Continue = new System.Windows.Forms.CheckBox();
+            this.btn_Read = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -108,9 +110,9 @@
             this.cb_R_HEX.Location = new System.Drawing.Point(22, 12);
             this.cb_R_HEX.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.cb_R_HEX.Name = "cb_R_HEX";
-            this.cb_R_HEX.Size = new System.Drawing.Size(99, 18);
+            this.cb_R_HEX.Size = new System.Drawing.Size(106, 18);
             this.cb_R_HEX.TabIndex = 60;
-            this.cb_R_HEX.Text = "Hex Recive";
+            this.cb_R_HEX.Text = "Hex Receive";
             this.cb_R_HEX.UseVisualStyleBackColor = true;
             // 
             // btnSend
@@ -547,11 +549,37 @@
             this.groupBox2.TabIndex = 100;
             this.groupBox2.TabStop = false;
             // 
+            // cb_R_Continue
+            // 
+            this.cb_R_Continue.AutoSize = true;
+            this.cb_R_Continue.Font = new System.Drawing.Font("宋体", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.cb_R_Continue.Location = new System.Drawing.Point(407, 12);
+            this.cb_R_Continue.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.cb_R_Continue.Name = "cb_R_Continue";
+            this.cb_R_Continue.Size = new System.Drawing.Size(85, 18);
+            this.cb_R_Continue.TabIndex = 101;
+            this.cb_R_Continue.Text = "持续监听";
+            this.cb_R_Continue.UseVisualStyleBackColor = true;
+            this.cb_R_Continue.CheckedChanged += new System.EventHandler(this.cb_R_Continue_CheckedChanged);
+            // 
+            // btn_Read
+            // 
+            this.btn_Read.Location = new System.Drawing.Point(683, 412);
+            this.btn_Read.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.btn_Read.Name = "btn_Read";
+            this.btn_Read.Size = new System.Drawing.Size(91, 29);
+            this.btn_Read.TabIndex = 102;
+            this.btn_Read.Text = "Read";
+            this.btn_Read.UseVisualStyleBackColor = true;
+            this.btn_Read.Click += new System.EventHandler(this.btn_Read_Click);
+            // 
             // FormDiag
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(946, 465);
+            this.Controls.Add(this.btn_Read);
+            this.Controls.Add(this.cb_R_Continue);
             this.Controls.Add(this.tbCKS_Value);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.tbEndToIndex);
@@ -628,6 +656,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox tbCKS_Value;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.CheckBox cb_R_Continue;
+        private System.Windows.Forms.Button btn_Read;
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -24,8 +25,10 @@ namespace CMNCOM
         {
             DeviceUI = new UserControl_UI(devName);
             DeviceUI.User_Load(true);
-            EmoudleDispose();//这里最好也释放掉COM口
+            EmoudleDispose();//这里最好也释放掉COM口        
         }
+
+      
 
         /// <summary>
         /// 

@@ -74,9 +74,8 @@ namespace CMNCOM
             this.drpStopBits.Items.AddRange(new object[] {
             "1",
             "2"});
-        }
+        }       
 
-      
 
         /// <summary>
         /// 加载配置文件并初始化及打开COM,只在EMoudle中被调用打开COM

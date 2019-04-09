@@ -151,7 +151,7 @@ namespace CMNCOM
             WriteLog(rtb_ReciveMsg, "Send: " + tb.Text + " " + tbCKS_Value.Text);
             rtb_ReciveMsg.Update();
             string rst = EMoudleInstance.SendReciveMsg(cb.Checked, tb.Text + tbCKS_Value.Text, cb_R_HEX.Checked, TimeOut,500, cb0D.Checked, cb0A.Checked);
-            WriteLog(rtb_ReciveMsg, "Recieve: " + rst + "\r\n");
+            WriteLog(rtb_ReciveMsg, "Receive: " + rst + "\r\n");
             //EMoudleInstance.DeviceClose();
             stopwatch.Stop();
             TimeSpan timeSpan = stopwatch.Elapsed;
@@ -316,6 +316,42 @@ namespace CMNCOM
                 tb.Text = tb.Text.Replace("|", "");
                 tb.Focus();
             }
+        }
+
+        private void cb_R_Continue_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cb_R_Continue.Checked)
+            {
+                EMoudleInstance.DeviceOpen();
+                EMoudleInstance.DeviceUI.ComDevice.DataReceived += new SerialDataReceivedEventHandler(ReceiveWaiter);
+
+            } else
+            {
+                EMoudleInstance.DeviceClose();
+                EMoudleInstance.DeviceUI.ComDevice.DataReceived -= new SerialDataReceivedEventHandler(ReceiveWaiter);
+            }
+            
+        }
+        private void ReceiveWaiter(object sender, SerialDataReceivedEventArgs e)
+        {
+            if (e.EventType != SerialData.Chars)
+            {
+                return;
+            }
+
+            if (EMoudleInstance.DeviceUI.ComDevice.BytesToRead <= 0)
+            {
+                return;
+            }
+            string str = EMoudleInstance.RecieveMsg(cb_R_HEX.Checked, 1);           
+            WriteLog(rtb_ReciveMsg, "AutoReceive: " + str + "\r\n");
+        }
+
+        private void btn_Read_Click(object sender, EventArgs e)
+        {
+            EMoudleInstance.DeviceOpen();
+            string str = EMoudleInstance.RecieveMsg(cb_R_HEX.Checked, 1);
+            WriteLog(rtb_ReciveMsg, "ReadReceive: " + str + "\r\n");
         }
     }
 }
